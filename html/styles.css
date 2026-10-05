@@ -432,6 +432,8 @@ button {
 .marker {
   pointer-events: auto;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .marker-scale {

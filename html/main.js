@@ -1,3 +1,5 @@
+const WORKS_URL = "https://designmoro.imweb.me/work";
+
 const LEGEND = {
   poster: "▲",
   branding: "●",
@@ -78,12 +80,12 @@ function initMarkers() {
   const NS = "http:" + "/" + "/www.w3.org/2000/svg";
 
   WORK_MARKERS.forEach((marker) => {
-    // Outer group = position only (never scaled — avoids hover jump)
-    const g = document.createElementNS(NS, "g");
+    // Outer link = position only (never scaled — avoids hover jump)
+    const g = document.createElementNS(NS, "a");
     g.setAttribute("class", "marker");
     g.setAttribute("transform", `translate(${marker.x} ${marker.y})`);
-    g.setAttribute("role", "button");
-    g.setAttribute("tabindex", "0");
+    g.setAttribute("href", WORKS_URL);
+    g.setAttribute("target", "_top");
     g.dataset.category = marker.category;
     g.setAttribute("aria-label", `${marker.title} (${marker.category})`);
 
