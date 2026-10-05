@@ -14,6 +14,27 @@ const LEGEND = {
  * Major works — SVG coords in island viewBox (1200×784).
  * Sampled from white fill pixels far from contour strokes.
  */
+const WORK_THUMBS = [
+  "https://cdn.imweb.me/thumbnail/20260914/6c0dbd6043e8e.jpg",
+  "https://cdn.imweb.me/thumbnail/20260820/c9900cbb7867c.jpg",
+  "https://cdn.imweb.me/thumbnail/20260512/f10c4efcb0cfa.jpg",
+  "https://cdn.imweb.me/thumbnail/20260512/023accb1a0c6f.jpg",
+  "https://cdn.imweb.me/thumbnail/20260512/d0c1f483422b4.jpg",
+  "https://cdn.imweb.me/thumbnail/20260421/51b7110af329c.jpg",
+  "https://cdn.imweb.me/thumbnail/20260420/6c7c9faee2d48.jpg",
+  "https://cdn.imweb.me/thumbnail/20260415/298cd377b7121.jpg",
+  "https://cdn.imweb.me/thumbnail/20260414/e75e60c7cf754.jpg",
+  "https://cdn.imweb.me/thumbnail/20260414/61de7cd926cb7.jpg",
+  "https://cdn.imweb.me/thumbnail/20260414/b632d5dc06389.jpg",
+  "https://cdn.imweb.me/thumbnail/20260409/5ed6215c3dfd4.jpg",
+  "https://cdn.imweb.me/thumbnail/20260115/8461c9fe8c60c.jpg",
+  "https://cdn.imweb.me/thumbnail/20250520/fbe9bbd2bf905.jpg",
+  "https://cdn.imweb.me/thumbnail/20250516/4a81bbc5b9e86.jpg",
+  "https://cdn.imweb.me/thumbnail/20250516/f9989e6a69013.jpg",
+  "https://cdn.imweb.me/thumbnail/20250516/43190815e0bc6.jpg",
+  "https://cdn.imweb.me/thumbnail/20250509/4876fcb558c37.jpg",
+];
+
 const WORK_MARKERS = [
   { id: "w1", category: "poster", x: 169, y: 255, title: "Poster field" },
   { id: "w2", category: "branding", x: 206, y: 388, title: "Brand system" },
@@ -79,7 +100,37 @@ function initMarkers() {
 
   const NS = "http:" + "/" + "/www.w3.org/2000/svg";
 
-  WORK_MARKERS.forEach((marker) => {
+  const preview = document.createElement("img");
+  preview.className = "marker-preview";
+  preview.alt = "";
+  document.body.appendChild(preview);
+
+  const placePreview = (anchor) => {
+    const rect = anchor.getBoundingClientRect();
+    const width = preview.offsetWidth || 168;
+    const height = preview.offsetHeight || 160;
+    let left = rect.left + rect.width / 2 - width / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - width - 8));
+    let top = rect.top - 14 - height;
+    if (top < 8) top = rect.bottom + 14;
+    preview.style.left = `${left}px`;
+    preview.style.top = `${top}px`;
+  };
+
+  const showPreview = (anchor, src) => {
+    if (preview.src !== src) preview.src = src;
+    preview.classList.add("is-on");
+    placePreview(anchor);
+    if (!preview.complete) {
+      preview.addEventListener("load", () => placePreview(anchor), { once: true });
+    }
+  };
+
+  const hidePreview = () => {
+    preview.classList.remove("is-on");
+  };
+
+  WORK_MARKERS.forEach((marker, index) => {
     // Outer link = position only (never scaled — avoids hover jump)
     const g = document.createElementNS(NS, "a");
     g.setAttribute("class", "marker");
@@ -102,12 +153,14 @@ function initMarkers() {
     text.setAttribute("class", "marker-symbol");
     text.textContent = LEGEND[marker.category] ?? "●";
 
-    const title = document.createElementNS(NS, "title");
-    title.textContent = marker.title;
+    const thumb = WORK_THUMBS[(index * 5 + 3) % WORK_THUMBS.length];
+    g.addEventListener("pointerenter", () => showPreview(g, thumb));
+    g.addEventListener("pointerleave", hidePreview);
+    g.addEventListener("focus", () => showPreview(g, thumb));
+    g.addEventListener("blur", hidePreview);
 
     scale.appendChild(hit);
     scale.appendChild(text);
-    g.appendChild(title);
     g.appendChild(scale);
     svg.appendChild(g);
   });

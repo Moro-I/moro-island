@@ -472,6 +472,25 @@ button {
   pointer-events: none;
 }
 
+.marker-preview {
+  position: fixed;
+  z-index: 80;
+  width: 168px;
+  height: auto;
+  max-height: 220px;
+  object-fit: contain;
+  pointer-events: none;
+  background: #fff;
+  border: 1px solid rgba(28, 28, 28, 0.18);
+  box-shadow: 0 10px 28px rgba(28, 28, 28, 0.16);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.marker-preview.is-on {
+  opacity: 1;
+}
+
 /* contact / about — fixed % of same stage */
 .sat {
   position: absolute;
