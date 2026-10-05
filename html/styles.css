@@ -1,0 +1,1161 @@
+:root {
+  --bg: #e2e2e2;
+  --ink: #1c1c1c;
+  --ink-muted: #5a5a5a;
+  --grid: rgba(28, 28, 28, 0.18);
+  --route: #3a6fbf;
+  --font-ui: "Space Grotesk", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  max-width: 100vw;
+}
+
+body:not(.subpage) {
+  overflow: hidden;
+}
+
+/* Imweb site chrome. The black preview bar is separate and only shows while editing. */
+#doz_header_wrap,
+#doz_footer_wrap,
+#doz_footer,
+#site_footer {
+  display: none !important;
+}
+
+body {
+  color: var(--ink);
+  background: var(--bg);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* —— Intro loader: empty sea, compass + boat that only rocks —— */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.7s linear;
+  animation: moro-loader-exit 0.8s ease 6.2s forwards;
+}
+
+.loader.is-done {
+  animation: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@keyframes moro-loader-exit {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.loader-sea {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.loader-boat {
+  position: absolute;
+  top: 54%;
+  left: 50%;
+  width: 48px;
+  margin: -108px 0 0 -24px; /* above the larger compass */
+  opacity: 0;
+  transform-origin: 50% 60%;
+  transition: opacity 0.5s ease;
+}
+
+.loader-boat.is-on {
+  opacity: 1;
+  animation: loader-boat-sway 4.2s ease-in-out infinite;
+}
+
+.loader-boat img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes loader-boat-sway {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-7deg);
+  }
+  35% {
+    transform: translate(4px, 2px) rotate(5deg);
+  }
+  65% {
+    transform: translate(-3px, 1px) rotate(-4deg);
+  }
+}
+
+.loader-compass {
+  position: absolute;
+  top: 54%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.compass-ring {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+}
+
+.compass-ring.soft {
+  stroke: rgba(28, 28, 28, 0.22);
+  stroke-width: 0.8;
+}
+
+.compass-ticks {
+  color: var(--ink);
+}
+
+.compass-ticks .minor {
+  stroke: rgba(28, 28, 28, 0.35);
+  stroke-width: 0.7;
+}
+
+.compass-n {
+  fill: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 500;
+}
+
+.compass-cardinal {
+  fill: rgba(28, 28, 28, 0.4);
+  font-family: var(--font-mono);
+  font-size: 6px;
+  font-weight: 500;
+}
+
+.compass-needle {
+  transform-origin: 32px 32px;
+}
+
+.compass-needle polygon {
+  fill: var(--ink);
+}
+
+.compass-needle .tail {
+  fill: rgba(28, 28, 28, 0.28);
+}
+
+.compass-hub {
+  fill: var(--bg);
+  stroke: var(--ink);
+  stroke-width: 1.2;
+}
+
+.loader-line {
+  position: absolute;
+  top: calc(54% + 78px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.loader-progress {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-boat.is-on {
+    animation: none;
+  }
+}
+
+/* —— Map scene —— */
+.scene {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: var(--moro-top, 0px);
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  z-index: 30;
+  overflow: hidden;
+  background: var(--bg);
+  opacity: 0.55;
+  filter: blur(14px);
+  transform: scale(1.02);
+  transition:
+    filter 1s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: moro-scene-enter 1s cubic-bezier(0.22, 1, 0.36, 1) 6.2s forwards;
+}
+
+@keyframes moro-scene-enter {
+  to {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+.scene.ready,
+.scene.skip {
+  animation: none;
+  opacity: 1;
+  /* blur(0) still softens vectors — drop the filter entirely */
+  filter: none;
+  transform: none;
+}
+
+.scene.skip {
+  transition: none;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.layer :is(a, button) {
+  pointer-events: auto;
+}
+
+.routes {
+  z-index: 0;
+}
+
+.island {
+  z-index: 1;
+}
+
+.map {
+  z-index: 1;
+}
+
+.grid {
+  z-index: 2;
+}
+
+.sats {
+  z-index: 4;
+}
+
+.chrome {
+  z-index: 6;
+  pointer-events: none;
+}
+
+.top-left {
+  position: absolute;
+  top: clamp(1.1rem, 3vh, 2rem);
+  left: clamp(1.1rem, 3vw, 2rem);
+}
+
+.top-right {
+  position: absolute;
+  top: clamp(1.1rem, 3vh, 2rem);
+  right: clamp(1.1rem, 3vw, 2rem);
+}
+
+/* —— Chart grid —— */
+.chart-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.axis,
+.diag,
+.circle,
+.circle-soft {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 0.9;
+}
+
+.axis {
+  stroke: rgba(28, 28, 28, 0.28);
+  stroke-width: 0.7;
+}
+
+.diag {
+  stroke: rgba(28, 28, 28, 0.22);
+  stroke-width: 0.7;
+  stroke-dasharray: 1.2 2;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+
+.circle {
+  stroke-width: 0.7;
+}
+
+.circle-soft {
+  stroke-width: 0.5;
+  opacity: 0.55;
+}
+
+/* —— ONE map stage (fixed 16:10). Everything inside scales together. —— */
+.map-stage {
+  /* Fit INSIDE the scene box (contain) so the whole map stays centered */
+  --stage-w: min(100%, calc(100% * 16 / 10));
+  --stage-h: calc(var(--stage-w) * 10 / 16);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--stage-w);
+  height: var(--stage-h);
+  pointer-events: none;
+  overflow: visible;
+  container-type: inline-size;
+}
+
+/* Routes share stage scale; overflow so side lanes paint into letterbox */
+.routes-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.routes-group {
+  fill: none;
+}
+
+.route {
+  fill: none;
+  stroke: var(--route);
+  stroke-width: 1.45;
+  stroke-dasharray: 4 7;
+  stroke-linecap: round;
+  opacity: 0.9;
+  animation: flow 12s linear infinite;
+}
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: -132;
+  }
+}
+
+/* MORO — fixed % of stage, optically centered (nudged up) */
+.moro-block {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%);
+  width: 54%;
+  aspect-ratio: 1200 / 784;
+  z-index: 2;
+}
+
+.island-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  object-fit: fill;
+}
+
+.island-markers {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+  display: block;
+}
+
+.marker {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.marker-scale {
+  transition: transform 0.2s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.marker:hover .marker-scale,
+.marker:focus-visible .marker-scale {
+  transform: scale(1.18);
+}
+
+.marker:focus-visible {
+  outline: none;
+}
+
+.marker:focus-visible .marker-hit {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.marker-hit {
+  fill: transparent;
+}
+
+.marker-symbol {
+  fill: var(--ink);
+  font-size: 32px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  paint-order: stroke fill;
+  stroke: #ffffff;
+  stroke-width: 6px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+/* contact / about — fixed % of same stage */
+.sat {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  z-index: 3;
+  pointer-events: auto;
+  overflow: visible;
+}
+
+.sat.contact {
+  left: 6%;
+  bottom: 16%;
+}
+
+.sat.about {
+  right: 6%;
+  bottom: 16%;
+}
+
+.sat-island {
+  width: 9.5cqi;
+  height: auto;
+  display: block;
+  user-select: none;
+  overflow: visible;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.sat.contact .sat-island {
+  width: 15cqi;
+  aspect-ratio: 232.4 / 255.1;
+  object-fit: contain;
+}
+
+.sat.about .sat-island {
+  width: 11.5cqi;
+}
+
+.sat-label {
+  font-family: var(--font-mono);
+  font-size: clamp(0.78rem, 1.9cqi, 1.05rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  /* Halo so labels stay clear over routes / chart lines */
+  text-shadow:
+    0 0 0.35em var(--bg),
+    0 0 0.35em var(--bg),
+    0 0 0.55em var(--bg);
+}
+
+.sat.about .sat-label {
+  order: -1;
+}
+
+/* —— Legend —— */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  user-select: none;
+}
+
+.legend-title {
+  font-family: var(--font-mono);
+  font-size: clamp(1.75rem, 3.8vw, 3rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.legend-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 1.05rem 0.95rem;
+  background: #ffffff;
+  border: 1.5px solid var(--ink);
+  width: fit-content;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 1.25vw, 1rem);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.symbol {
+  width: 1.15rem;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+/* —— Clock —— */
+.clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: clamp(1.75rem, 3.8vw, 3rem);
+  font-weight: 100;
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  color: var(--ink);
+  user-select: none;
+}
+
+/* —— Visitor fix (you are here = MORO) —— */
+.bottom-center {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.1rem, 3vh, 2rem);
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.fix-fix {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  color: var(--ink);
+  user-select: none;
+}
+
+.fix-name {
+  font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  max-width: min(90vw, 36rem);
+  line-height: 1.35;
+}
+
+.fix-coords {
+  font-size: clamp(1rem, 1.8vw, 1.35rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+
+/* —— Cursor boat —— */
+.boat {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  width: 28px;
+  height: auto;
+  margin: -6px 0 0 -14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  will-change: transform;
+}
+
+.boat.is-on {
+  opacity: 0.95;
+}
+
+.boat img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+@media (pointer: coarse) {
+  .boat {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boat {
+    display: none;
+  }
+}
+
+/* —— About / Contact —— */
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+}
+
+.page-title {
+  font-family: var(--font-ui);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.copy {
+  max-width: 28rem;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  margin-bottom: 2rem;
+}
+
+.back {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--ink);
+  width: fit-content;
+  padding-bottom: 0.15rem;
+  transition: opacity 0.2s ease;
+}
+
+.back:hover {
+  opacity: 0.55;
+}
+
+/* —— Contact form page —— */
+.contact-page {
+  --contact-pad-x: clamp(1.25rem, 3vw, 2.25rem);
+  background: #fff;
+  color: var(--ink);
+  min-height: 100dvh;
+}
+
+.contact-back {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 10;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.contact-back:hover {
+  opacity: 1;
+}
+
+.contact-page .contact {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 8vw, 5.5rem) var(--contact-pad-x) 4rem;
+  display: grid;
+  grid-template-columns: minmax(11rem, 15rem) minmax(0, 1fr);
+  column-gap: clamp(2rem, 4vw, 4rem);
+  row-gap: 2.5rem;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+.contact-head {
+  position: sticky;
+  top: 2rem;
+}
+
+.contact-title {
+  font-family: var(--font-ui);
+  font-size: clamp(2.6rem, 7vw, 3.6rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.1rem;
+}
+
+.contact-direct {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.contact-direct a:hover {
+  opacity: 0.55;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.65rem;
+  width: 100%;
+  max-width: 48rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  border: 0;
+  min-width: 0;
+}
+
+.field-label {
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.field-label i {
+  font-style: normal;
+  color: var(--ink);
+}
+
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form textarea {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgba(28, 28, 28, 0.35);
+  border-radius: 0;
+  background: transparent;
+  padding: 0.55rem 0 0.65rem;
+  font: inherit;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--ink);
+  outline: none;
+  resize: vertical;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-bottom-color: var(--ink);
+}
+
+.phone-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+
+.phone-dash {
+  opacity: 0.45;
+  padding-bottom: 0.65rem;
+}
+
+.phone-row input {
+  width: 4.75rem;
+  text-align: center;
+}
+
+.field-budget {
+  gap: 0;
+}
+
+.field-budget > legend {
+  padding: 0;
+  margin-bottom: 0.95rem;
+}
+
+.budget-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.95rem 0.65rem;
+}
+
+.chip {
+  cursor: pointer;
+}
+
+.chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.1rem;
+  padding: 0.35rem 0.95rem;
+  border: 1px solid rgba(28, 28, 28, 0.45);
+  border-radius: 999px;
+  font-size: 0.88rem;
+  letter-spacing: -0.01em;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.chip input:focus-visible + span {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.chip input:checked + span {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.budget-other {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  flex: 1 1 100%;
+  min-width: 8rem;
+  margin-top: 0.15rem;
+}
+
+.budget-other-prefix {
+  opacity: 0.55;
+}
+
+.budget-other input {
+  width: 7.5rem;
+  border-bottom-style: solid;
+}
+
+.budget-other input:disabled {
+  opacity: 0.35;
+}
+
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid rgba(28, 28, 28, 0.45);
+  border-radius: 0.35rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.15s ease;
+}
+
+.file-btn:hover {
+  background: rgba(28, 28, 28, 0.04);
+}
+
+.file-btn input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.file-name {
+  margin-top: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.consent-box {
+  max-height: 9.5rem;
+  overflow: auto;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(28, 28, 28, 0.28);
+  background: #f3f3f3;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.consent-box strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.consent-box p + p {
+  margin-top: 0.65rem;
+}
+
+.consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.consent-check input {
+  margin-top: 0.2rem;
+  accent-color: var(--ink);
+}
+
+.contact-submit {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 0.15rem;
+}
+
+.submit-btn {
+  min-width: 9.5rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.submit-btn:hover {
+  opacity: 0.82;
+}
+
+.submit-btn:active {
+  opacity: 0.7;
+}
+
+.submit-boat {
+  width: 52px;
+  height: auto;
+  opacity: 0.9;
+  transform: translateX(0);
+  transform-origin: center center;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.submit-boat.is-launching {
+  animation:
+    boat-whoosh-x 0.85s linear forwards,
+    boat-whoosh-fade 0.85s linear forwards;
+}
+
+@keyframes boat-whoosh-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(140px);
+  }
+}
+
+@keyframes boat-whoosh-fade {
+  0%,
+  55% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.contact-footer {
+  background: #ececec;
+  padding: clamp(2rem, 5vw, 3rem) 0 2.4rem;
+  text-align: left;
+}
+
+.contact-footer-inner {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding: 0 var(--contact-pad-x);
+  box-sizing: border-box;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  margin-bottom: 1.4rem;
+  font-size: 0.85rem;
+}
+
+.footer-links a:hover {
+  opacity: 0.55;
+}
+
+.footer-brand-ko {
+  font-size: 0.95rem;
+  margin-bottom: 0.15rem;
+}
+
+.footer-brand {
+  font-family: var(--font-ui);
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+}
+
+.footer-meta {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.footer-copy {
+  margin-top: 1.1rem;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .contact-page .contact {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+
+  .contact-head {
+    position: static;
+  }
+
+  .contact-direct {
+    margin-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .phone-row input {
+    width: 4.5rem;
+  }
+
+  .contact-submit {
+    flex-wrap: wrap;
+  }
+
+  .top-left {
+    max-width: 48vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route {
+    animation: none;
+  }
+
+  .submit-boat.is-launching {
+    animation: none;
+    opacity: 0;
+  }
+
+  .loader {
+    animation: none;
+    transition: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .scene {
+    transition: none;
+    filter: none;
+    transform: none;
+    opacity: 1;
+  }
+}

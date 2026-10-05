@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>디자인모로</title>
+    <meta name="description" content="MORO island — design portfolio" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div
+      class="loader"
+      id="loader"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label="Loading MORO island"
+    >
+      <div class="loader-sea" aria-hidden="true">
+        <div class="loader-boat" id="loader-boat">
+          <img src="https://cdn.imweb.me/thumbnail/20261005/938372790ea72.png" alt="" width="102" height="43" draggable="false" />
+        </div>
+      </div>
+
+      <svg
+        class="loader-compass"
+        id="loader-compass"
+        viewBox="0 0 64 64"
+        aria-hidden="true"
+      >
+        <circle class="compass-ring" cx="32" cy="32" r="28" />
+        <circle class="compass-ring soft" cx="32" cy="32" r="22" />
+        <g class="compass-ticks" stroke="currentColor" stroke-width="0.9">
+          <line x1="32" y1="6" x2="32" y2="11" />
+          <line x1="58" y1="32" x2="53" y2="32" />
+          <line x1="32" y1="58" x2="32" y2="53" />
+          <line x1="6" y1="32" x2="11" y2="32" />
+          <line class="minor" x1="51.5" y1="12.5" x2="48.7" y2="15.3" />
+          <line class="minor" x1="51.5" y1="51.5" x2="48.7" y2="48.7" />
+          <line class="minor" x1="12.5" y1="51.5" x2="15.3" y2="48.7" />
+          <line class="minor" x1="12.5" y1="12.5" x2="15.3" y2="15.3" />
+        </g>
+        <text class="compass-n" x="32" y="18" text-anchor="middle">N</text>
+        <text class="compass-cardinal" x="50" y="34" text-anchor="middle">E</text>
+        <text class="compass-cardinal" x="32" y="52" text-anchor="middle">S</text>
+        <text class="compass-cardinal" x="14" y="34" text-anchor="middle">W</text>
+        <g class="compass-needle" id="loader-needle">
+          <polygon points="32,10 35,32 32,28 29,32" />
+          <polygon class="tail" points="32,54 35,32 32,36 29,32" />
+        </g>
+        <circle class="compass-hub" cx="32" cy="32" r="2.2" />
+      </svg>
+
+      <p class="loader-line">Looking for Design...</p>
+
+      <div
+        class="loader-progress"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+        id="loader-progress"
+        aria-label="Loading"
+      ></div>
+    </div>
+
+    <main class="scene" id="scene">
+      <!--
+        ONE map: fixed 16:10 stage. Islands + routes live here.
+        Viewport only scales this whole stage — nothing moves relative to anything else.
+      -->
+      <div class="layer map" data-depth="5">
+        <div class="map-stage">
+          <svg
+            class="routes-svg"
+            viewBox="0 0 1600 1000"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden="true"
+          >
+            <g id="routes-group" class="routes-group">
+              <!--
+                Land boxes (approx, stage 1600×1000; islands nudged up):
+                  MORO    x 370–1230, y 120–680
+                  contact x 80–260,   y 650–880
+                  about   x 1320–1520,y 640–860
+                Keep lanes in open water; extend past stage for letterbox.
+              -->
+
+              <!-- A. Far left → west of contact → under MORO → south of about → far right -->
+              <path
+                d="M -720 60
+                   C -400 90, -200 100, -40 80
+                   C 100 140, 40 240, 140 300
+                   C 220 350, 100 420, 160 500
+                   C 200 560, 80 620, 30 700
+                   C 0 780, 40 880, 200 910
+                   C 420 940, 560 820, 720 800
+                   C 920 800, 1100 760, 1240 800
+                   C 1320 860, 1380 920, 1500 930
+                   C 1620 940, 1800 900, 2320 890"
+                class="route"
+                style="animation-delay: 0s"
+              />
+
+              <!-- B. Far top → east water → clear of about (stay x≥1580) → far right -->
+              <path
+                d="M 700 -420
+                   C 780 -220, 820 -80, 900 40
+                   C 1000 120, 1200 20, 1380 140
+                   C 1500 220, 1580 340, 1600 480
+                   C 1620 600, 1630 680, 1640 760
+                   C 1650 820, 1700 840, 1800 820
+                   C 2000 800, 2160 790, 2320 790"
+                class="route"
+                style="animation-delay: -5s"
+              />
+
+              <!-- C. Far left → clear west of contact → far bottom -->
+              <path
+                d="M -720 340
+                   C -400 330, -200 350, -40 360
+                   C 40 300, -10 440, -40 560
+                   C -60 680, -50 780, -30 880
+                   C 20 980, 140 1040, 300 1100
+                   C 420 1160, 540 1240, 640 1320
+                   C 700 1360, 720 1400, 760 1420"
+                class="route"
+                style="animation-delay: -10s"
+              />
+
+              <!-- D. North of MORO — far left/top to far right -->
+              <path
+                d="M -720 40
+                   C -400 -40, -200 80, -40 60
+                   C 160 -20, 320 100, 520 10
+                   C 720 -60, 900 90, 1120 0
+                   C 1300 -70, 1480 60, 1640 -10
+                   C 1800 -40, 2000 -20, 2320 -20"
+                class="route"
+                style="animation-delay: -15s"
+              />
+
+              <!-- E. Mid → far bottom (fills lower letterbox) -->
+              <path
+                d="M 200 920
+                   C 360 980, 520 940, 700 1000
+                   C 880 1060, 1040 980, 1200 1040
+                   C 1320 1080, 1400 1180, 1480 1420"
+                class="route"
+                style="animation-delay: -8s"
+              />
+            </g>
+          </svg>
+
+          <div class="moro-block">
+            <img
+              class="island-img"
+              src="https://cdn.imweb.me/thumbnail/20261005/0337b5ed16ca7.png"
+              alt="MORO island"
+              width="1200"
+              height="784"
+              draggable="false"
+            />
+            <svg
+              class="island-markers"
+              id="markers"
+              viewBox="0 0 1200 784"
+              preserveAspectRatio="xMidYMid meet"
+              aria-label="Work markers"
+            ></svg>
+          </div>
+
+          <a href="contact.html" class="sat contact" aria-label="Contact">
+            <img
+              class="sat-island"
+              src="https://cdn.imweb.me/thumbnail/20261005/3a6d5423b237c.png"
+              alt=""
+              width="232"
+              height="255"
+              draggable="false"
+            />
+            <span class="sat-label">contact</span>
+          </a>
+
+          <a href="about.html" class="sat about" aria-label="About">
+            <span class="sat-label">about</span>
+            <img
+              class="sat-island"
+              src="https://cdn.imweb.me/thumbnail/20261005/c324938ed8a72.png"
+              alt=""
+              width="211"
+              height="269"
+              draggable="false"
+            />
+          </a>
+        </div>
+      </div>
+
+      <div class="layer grid" data-depth="4">
+        <svg
+          class="chart-svg"
+          viewBox="0 0 1000 560"
+          preserveAspectRatio="xMidYMid slice"
+          aria-hidden="true"
+        >
+          <line x1="500" y1="-80" x2="500" y2="640" class="axis" />
+          <line x1="-80" y1="280" x2="1080" y2="280" class="axis" />
+          <line x1="-600" y1="-336" x2="1600" y2="896" class="diag" />
+          <line x1="-600" y1="896" x2="1600" y2="-336" class="diag" />
+          <circle cx="500" cy="280" r="330" class="circle" />
+          <circle cx="500" cy="280" r="250" class="circle-soft" />
+        </svg>
+      </div>
+
+      <div class="layer chrome" data-depth="1">
+        <div class="top-left">
+          <aside class="legend" aria-label="Map legend">
+            <p class="legend-title">Welcome to MORO island</p>
+            <ul class="legend-list">
+              <li class="legend-item">
+                <span class="symbol" aria-hidden="true">▲</span><span>Poster</span>
+              </li>
+              <li class="legend-item">
+                <span class="symbol" aria-hidden="true">●</span><span>Branding</span>
+              </li>
+              <li class="legend-item">
+                <span class="symbol" aria-hidden="true">◎</span><span>Package</span>
+              </li>
+              <li class="legend-item">
+                <span class="symbol" aria-hidden="true">◉</span><span>Logo</span>
+              </li>
+              <li class="legend-item">
+                <span class="symbol" aria-hidden="true">■</span><span>Exhibition</span>
+              </li>
+              <li class="legend-item">
+                <span class="symbol" aria-hidden="true">◆</span><span>Character</span>
+              </li>
+              <li class="legend-item">
+                <span class="symbol" aria-hidden="true">□</span><span>Book</span>
+              </li>
+            </ul>
+          </aside>
+        </div>
+        <div class="top-right">
+          <time class="clock" id="clock">
+            <span id="clock-date"></span>
+            <span id="clock-time"></span>
+          </time>
+        </div>
+        <div class="bottom-center">
+          <p class="fix-fix" id="fix" hidden>
+            <span class="fix-name">Where you are is MORO island</span>
+            <span class="fix-coords" id="fix-coords"></span>
+          </p>
+        </div>
+      </div>
+
+      <div class="boat" id="boat" hidden aria-hidden="true">
+        <img src="https://cdn.imweb.me/thumbnail/20261005/938372790ea72.png" alt="" width="102" height="43" draggable="false" />
+      </div>
+    </main>
+
+    <script src="main.js"></script>
+  </body>
+</html>
